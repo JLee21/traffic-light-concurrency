@@ -21,6 +21,7 @@ public:
     void simulate();
 
     // miscellaneous
+    // ????
     std::shared_ptr<Vehicle> get_shared_this() { return shared_from_this(); }
 
 private:
