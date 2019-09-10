@@ -7,7 +7,6 @@
 #include "Intersection.h"
 #include "Graphics.h"
 
-
 // Paris
 void createTrafficObjects_Paris(std::vector<std::shared_ptr<Street>> &streets, std::vector<std::shared_ptr<Intersection>> &intersections, std::vector<std::shared_ptr<Vehicle>> &vehicles, std::string &filename, int nVehicles)
 {
@@ -124,6 +123,7 @@ int main()
     /* PART 2 : simulate traffic objects */
 
     // simulate intersection
+    // *** are we passing "i" as reference?
     std::for_each(intersections.begin(), intersections.end(), [](std::shared_ptr<Intersection> &i) {
         i->simulate();
     });

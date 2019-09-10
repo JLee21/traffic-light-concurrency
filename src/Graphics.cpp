@@ -56,9 +56,9 @@ void Graphics::drawTrafficObjects()
             cv::RNG rng(it->getID());
             int b = rng.uniform(0, 255);
             int g = rng.uniform(0, 255);
-            int r = sqrt(255*255 - g*g - r*r); // ensure that length of color vector is always 255
-            cv::Scalar vehicleColor = cv::Scalar(b,g,r);
-            cv::circle(_images.at(1), cv::Point2d(posx, posy), 50, vehicleColor, -1);
+            int r = sqrt(255 * 255 - g * g - r * r); // ensure that length of color vector is always 255
+            cv::Scalar vehicleColor = cv::Scalar(b, g, r);
+            cv::circle(_images.at(1), cv::Point2d(posx, posy), 30, vehicleColor, -1);
         }
     }
 
