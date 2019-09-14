@@ -104,7 +104,7 @@ void Vehicle::drive()
                 {
                     // this street is a dead-end, so drive back the same way
                     nextStreet = _currStreet;
-                }
+                }   
 
                 // pick the one intersection at which the vehicle is currently not
                 std::shared_ptr<Intersection> nextIntersection = nextStreet->getInIntersection()->getID() == _currDestination->getID() ? nextStreet->getOutIntersection() : nextStreet->getInIntersection();

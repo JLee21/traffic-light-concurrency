@@ -2,21 +2,39 @@
 #include <random>
 #include "TrafficLight.h"
 
+#define printVariableNameAndValue(x) std::cout<<"name**"<<(#x)<<"** value => "<<x<<"\n"
+
 /* Implementation of class "MessageQueue" */
 
-// template <typename T>
-// T MessageQueue<T>::receive()
-// {
-//     // FP.5a : The method receive should use std::unique_lock<std::mutex> and _condition.wait()
-//     // to wait for and receive new messages and pull them from the queue using move semantics.
-//     // The received object should then be returned by the receive function.
-// }
+template <typename T>
+T MessageQueue<T>::receive()
+{
+    // FP.5a : The method receive should use std::unique_lock<std::mutex> and _condition.wait() 
+    // to wait for and receive new messages and pull them from the queue using move semantics. 
+    // The received object should then be returned by the receive function. 
 
-// template <typename T>
-// void MessageQueue<T>::send(T &&msg){
-//     // FP.4a : The method send should use the mechanisms std::lock_guard<std::mutex>
-//     // as well as _condition.notify_one() to add a new message to the queue and afterwards send a notification.
-// }
+    std::cout << "inside receive" << std::endl;
+    std::unique_lock<std::mutex> lck(_mtx);
+    _cond.wait(lck, [this] { return !_queue.empty(); });
+    T lightPhase = std::move(_queue.back());
+    // remove the last element from the _queue
+    _queue.pop_back();
+    return lightPhase;
+}
+
+template <typename T>
+void MessageQueue<T>::send(T&& msg){
+    // FP.4a : The method send should use the mechanisms std::lock_guard<std::mutex> 
+    // as well as _condition.notify_one() to add a new message to the queue and afterwards send a notification.
+
+    std::cout << "SEND inside" << std::endl;
+    // lock the thread while msg is being written to the queue
+    // std::lock_guard<std::mutex> lck(_mtx);
+    std::cout << "SEND pushing back" << std::endl;
+    _queue.push_back(std::move(msg));
+    std::cout << "_cond.notify_one();" << std::endl;
+    _cond.notify_one();
+}
 
 // *** This does not work -- something about missing vtable.
 // so I moved this constructor inside of the header file.
@@ -26,12 +44,17 @@
 //     _currentPhase = TrafficLightPhase::red;
 // }
 
-// void TrafficLight::waitForGreen()
-// {
-//     // FP.5b : add the implementation of the method waitForGreen, in which an infinite while-loop 
-//     // runs and repeatedly calls the receive function on the message queue. 
-//     // Once it receives TrafficLightPhase::green, the method returns.
-// }
+void TrafficLight::waitForGreen()
+{
+    // FP.5b : add the implementation of the method waitForGreen, in which an infinite while-loop 
+    // runs and repeatedly calls the receive function on the message queue. 
+    // Once it receives TrafficLightPhase::green, the method returns.
+    while(true){
+        if(_messageQ->receive() == TrafficLightPhase::green)
+            std::cout << "Received a Green " << std::endl;
+            return;
+    }
+}
 
 TrafficLightPhase TrafficLight::getCurrentPhase()
 {
@@ -41,14 +64,14 @@ TrafficLightPhase TrafficLight::getCurrentPhase()
 void TrafficLight::simulate()
 {
     // FP.2b : Finally, the private method „cycleThroughPhases“ should be started 
-    // in a thread when the public method „simulate“ is called. To do this, use 
-    // the thread queue in the base class. 
+    // in a thread when the public method „simulate“ is called. 
+    // To do this, use the thread queue in the base class. 
     threads.emplace_back(std::thread(&TrafficLight::cycleThroughPhases, this));
 
 }
 
-double getRandomWaitTime(){
-    std::uniform_int_distribution<double> rand(4, 6);
+double getRandomWaitTimeInMs(){
+    std::uniform_real_distribution<double> rand(4, 6);
     std::mt19937 gen;
     return rand(gen)*1000; // return in ms
 }
@@ -64,26 +87,33 @@ void TrafficLight::cycleThroughPhases()
     //  Also, the while-loop should use std::this_thread::sleep_for to wait 1ms 
     //  between two cycles.
 
-    // The cycle duration should be a random value between 4 and 6 seconds (expressed in ms)
-    double cycleDuration = getRandomWaitTime();
+    TrafficLightPhase testPhase = TrafficLightPhase::red;
+    _messageQ->send(std::move(testPhase));
 
-    std::chrono::time_point<std::chrono::system_clock> lastUpdate;
-    lastUpdate = std::chrono::system_clock::now();
+    // // The cycle duration should be a random value between 4 and 6 seconds (expressed in ms)
+    // double cycleDuration = getRandomWaitTimeInMs();
+    // printVariableNameAndValue(cycleDuration);
 
-    while(true){
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    // std::chrono::time_point<std::chrono::system_clock> lastUpdate;
+    // lastUpdate = std::chrono::system_clock::now();
 
-        // compute time difference to stop watch
-        long timeSinceLastUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastUpdate).count();
-        if (timeSinceLastUpdate >= cycleDuration)
-        {
-            // Toggle the current phase of the traffic light between red and green
-            _currentPhase = _currentPhase == TrafficLightPhase::red ? TrafficLightPhase::green : TrafficLightPhase::red;
+    // while(true){
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-            // Send an udpate method to the message queue using move semantics.
-            // ** What message queue? We have to build it out in step FP.3 
-            // TODO:
+    //     // compute time difference to stop watch
+    //     long timeSinceLastUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastUpdate).count();
+    //     if (timeSinceLastUpdate >= cycleDuration)
+    //     {
+    //         // Toggle the current phase of the traffic light between red and green
+    //         _currentPhase = _currentPhase == TrafficLightPhase::red ? TrafficLightPhase::green : TrafficLightPhase::red;
+    //         std::unique_lock<std::mutex> lck(_mtx);
+    //         std::cout << "Light ID: "<< _id << "\tChanging Light to " << _currentPhase << std::endl;
 
-        }
-    }
+    //         // Send an udpate method to the message queue using move semantics.
+    //         // ** What message queue? We have to build it out in step FP.3 and FP.4b
+    //         _messageQ->send(_currentPhase);
+    //         lastUpdate = std::chrono::system_clock::now();
+
+    //     }
+    // }
 }
