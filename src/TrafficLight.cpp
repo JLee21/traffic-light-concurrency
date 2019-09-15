@@ -29,7 +29,6 @@ void MessageQueue<T>::send(T &&msg)
 {
     // FP.4a : The method send should use the mechanisms std::lock_guard<std::mutex>
     // as well as _condition.notify_one() to add a new message to the queue and afterwards send a notification.
-
     std::lock_guard<std::mutex> lck(_mtxMQ);
     _queue.emplace_front(std::move(msg));
     // _queue should only contain one element, so push out the last element
@@ -37,14 +36,6 @@ void MessageQueue<T>::send(T &&msg)
         _queue.pop_back(); 
     _cond.notify_one();
 }
-
-// *** This does not work -- something about missing vtable.
-// so I moved this constructor inside of the header file.
-/* Implementation of class "TrafficLight" */
-// TrafficLight::TrafficLight()
-// {
-//     _currentPhase = TrafficLightPhase::red;
-// }
 
 void TrafficLight::waitForGreen()
 {
@@ -73,18 +64,15 @@ void TrafficLight::simulate()
     threads.emplace_back(std::thread(&TrafficLight::cycleThroughPhases, this));
 }
 
-int getRandomWaitTimeInMs()
+double getRandomWaitTimeInMs()
 {
-    srand(time(NULL));
-    return (rand() % 6 + 4) * 1000;
-}
-
-double getRandomWaitTimeInMs2()
-{
+    /*
+    Return a random number between 4000-6000.
+    */
     typedef std::chrono::high_resolution_clock myclock;
     myclock::time_point beginning = myclock::now();
-
     std::uniform_real_distribution<double> rand(4, 6);
+
     // obtain a seed from the timer
     myclock::duration d = myclock::now() - beginning;
     unsigned seed = d.count();
@@ -105,7 +93,7 @@ void TrafficLight::cycleThroughPhases()
     //  Also, the while-loop should use std::this_thread::sleep_for to wait 1ms
     //  between two cycles.
 
-    int cycleDuration = getRandomWaitTimeInMs2();
+    int cycleDuration = getRandomWaitTimeInMs();
     std::chrono::time_point<std::chrono::system_clock> lastUpdate;
     lastUpdate = std::chrono::system_clock::now();
 
@@ -117,11 +105,25 @@ void TrafficLight::cycleThroughPhases()
         long timeSinceLastUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastUpdate).count();
         if (timeSinceLastUpdate >= cycleDuration)
         {
+            cycleDuration = getRandomWaitTimeInMs(); // reset light duration
+            switch(_currentPhase){
+                case TrafficLightPhase::green:
+                    cycleDuration = YELLOW_LIGHT_DURATION; // overwrite duration to static value ms
+                    _currentPhase = TrafficLightPhase::yellow;
+                    break;
+                case TrafficLightPhase::yellow:
+                    _currentPhase = TrafficLightPhase::red;
+                    break;
+                case TrafficLightPhase::red:
+                    _currentPhase = TrafficLightPhase::green;
+                    break;
+            }
+
             // Toggle the current phase of the traffic light between red and green
-            _currentPhase = _currentPhase == TrafficLightPhase::red ? TrafficLightPhase::green : TrafficLightPhase::red;
+            // _currentPhase = _currentPhase == TrafficLightPhase::red ? TrafficLightPhase::green : TrafficLightPhase::red;
             _messageQ.send(std::move(_currentPhase));
             lastUpdate = std::chrono::system_clock::now();
-            cycleDuration = getRandomWaitTimeInMs2();
+            
         }
     }
 }

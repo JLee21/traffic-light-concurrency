@@ -41,6 +41,7 @@ void Graphics::drawTrafficObjects()
     for (auto it : _trafficObjects)
     {
         double posx, posy;
+        cv::Scalar trafficLightColor;
         it->getPosition(posx, posy);
 
         if (it->getType() == ObjectType::objectIntersection)
@@ -49,19 +50,24 @@ void Graphics::drawTrafficObjects()
             std::shared_ptr<Intersection> intersection = std::dynamic_pointer_cast<Intersection>(it);
 
             // set color according to traffic light and draw the intersection as a circle
-            cv::Scalar trafficLightColor = intersection->trafficLightIsGreen() == true ? cv::Scalar(0, 255, 0) : cv::Scalar(0, 0, 255);
+            // cv::Scalar trafficLightColor = intersection->trafficLightIsGreen() == true ? cv::Scalar(0, 255, 0) : cv::Scalar(0, 0, 255);
+
+            // decide if Traffic is green, yellow, or red
+            
+            switch (intersection->getTrafficLightPhase()){
+                case TrafficLightPhase::green:
+                    trafficLightColor = cv::Scalar(0, 255, 0);
+                    break;
+                case TrafficLightPhase::yellow:
+                    trafficLightColor = cv::Scalar(0, 255, 255);
+                    break;
+                case TrafficLightPhase::red:
+                    trafficLightColor = cv::Scalar(0, 0, 255);
+                    break;
+            }
             cv::circle(_images.at(1), cv::Point2d(posx, posy), 50, trafficLightColor, -1);
             cv::putText(_images.at(1), "i."+std::to_string(it->getID()), cv::Point2d(posx - 35, posy + 15), 0, 1, cv::Scalar(0, 0, 0), 3);            
         }
-        // else if (it->getType() == ObjectType::objectTrafficLight)
-        // {
-        //     std::cout << "asdf\n";
-        //     // cast object type from TrafficObject to Intersection
-        //     std::shared_ptr<Intersection> intersection = std::dynamic_pointer_cast<Intersection>(it);
-
-        //     cv::circle(_images.at(1), cv::Point2d(posx, posy+50), 50, cv::Scalar(100, 155, 155), -1);
-        //     cv::putText(_images.at(1), "tl."+std::to_string(it->getID()), cv::Point2d(posx - 35, posy + 50), 0, 1, cv::Scalar(0, 0, 0), 3);
-        // }
         else if (it->getType() == ObjectType::objectVehicle)
         {
             cv::RNG rng(it->getID());

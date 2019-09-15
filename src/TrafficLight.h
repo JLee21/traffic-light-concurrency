@@ -11,6 +11,8 @@
 #include <condition_variable>
 #include "TrafficObject.h"
 
+#define YELLOW_LIGHT_DURATION 1500
+
 // forward declarations to avoid include cycle
 class Vehicle;
 
@@ -44,6 +46,7 @@ private:
 enum TrafficLightPhase
 {
     green,
+    yellow,
     red,
 };
 
@@ -60,26 +63,19 @@ public:
     void waitForGreen();
     void simulate();
     TrafficLightPhase getCurrentPhase();
-    void printTLQueueSize() { 
-        std::unique_lock<std::mutex> lck(_mtx);
-        std::cout << "Traffic Light #" << this->getID() << " queue size = " << _messageQ.getSize() << std::endl;
-        lck.unlock();
-    }
 
 private:
     // typical behaviour methods
     void cycleThroughPhases();
     TrafficLightPhase _currentPhase;
-    long _id;
+    // static const int YELLOW_LIGHT_DURATION = 1500; // in ms
 
     // FP.4b : create a private member of type MessageQueue for messages of type TrafficLightPhase
     // and use it within the infinite loop to push each new TrafficLightPhase into it by calling
     // send in conjunction with move semantics.
     MessageQueue<TrafficLightPhase> _messageQ;
-
     // NOTE: we should not create a share pointer b/c each TrafficLight object
     // has its own MessageQueue. IE there is no master queue for all TrafficLights.
-    // std::shared_ptr<MessageQueue<TrafficLightPhase>> _messageQ;
 
     std::condition_variable _condition;
     std::mutex _mutex;
