@@ -25,17 +25,11 @@ template <class T>
 class MessageQueue
 {
 public:
-    MessageQueue() {
-        std::deque<T> _queue(1);
-        std::cout << "Max size = " << _queue.max_size() << std::endl;
-        std::cout << "size = " << _queue.size() << std::endl;
-    }
     void send(T &&phase);
     T receive();
     int getSize() { return _queue.size(); }
 
 private:
-    // limit queue size to only one (the most recent) using fill constructor http://www.cplusplus.com/reference/deque/deque/deque/
     std::deque<T> _queue;
     std::condition_variable _cond;
     std::mutex _mtxMQ;
@@ -58,6 +52,7 @@ class TrafficLight : public TrafficObject
 public:
     TrafficLight()
     {
+        _type = ObjectType::objectTrafficLight;
         _currentPhase = TrafficLightPhase::red;
     }
 

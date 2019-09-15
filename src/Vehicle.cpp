@@ -9,7 +9,7 @@ Vehicle::Vehicle()
     _currStreet = nullptr;
     _posStreet = 0.0;
     _type = ObjectType::objectVehicle;
-    _speed = 500; // m/s
+    _speed = 400; // m/s
 }
 
 void Vehicle::setCurrentDestination(std::shared_ptr<Intersection> destination)

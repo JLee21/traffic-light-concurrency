@@ -51,18 +51,17 @@ void Graphics::drawTrafficObjects()
             // set color according to traffic light and draw the intersection as a circle
             cv::Scalar trafficLightColor = intersection->trafficLightIsGreen() == true ? cv::Scalar(0, 255, 0) : cv::Scalar(0, 0, 255);
             cv::circle(_images.at(1), cv::Point2d(posx, posy), 50, trafficLightColor, -1);
-            cv::putText(_images.at(1), "i."+std::to_string(it->getID()), cv::Point2d(posx - 35, posy + 15), 0, 1, cv::Scalar(0, 0, 0), 3);
+            cv::putText(_images.at(1), "i."+std::to_string(it->getID()), cv::Point2d(posx - 35, posy + 15), 0, 1, cv::Scalar(0, 0, 0), 3);            
         }
-        else if (it->getType() == ObjectType::objectVehicle)
-        {
-            cv::RNG rng(it->getID());
-            int b = rng.uniform(0, 255);
-            int g = rng.uniform(0, 255);
-            int r = sqrt(255 * 255 - g * g - r * r); // ensure that length of color vector is always 255
-            cv::Scalar vehicleColor = cv::Scalar(b, g, r);
-            cv::circle(_images.at(1), cv::Point2d(posx, posy), 35, vehicleColor, -1);
-            cv::putText(_images.at(1), "v."+std::to_string(it->getID()), cv::Point2d(posx - 35, posy + 15), 2, 1, cv::Scalar(0, 0, 0), 2);
-        }
+        // else if (it->getType() == ObjectType::objectTrafficLight)
+        // {
+        //     std::cout << "asdf\n";
+        //     // cast object type from TrafficObject to Intersection
+        //     std::shared_ptr<Intersection> intersection = std::dynamic_pointer_cast<Intersection>(it);
+
+        //     cv::circle(_images.at(1), cv::Point2d(posx, posy+50), 50, cv::Scalar(100, 155, 155), -1);
+        //     cv::putText(_images.at(1), "tl."+std::to_string(it->getID()), cv::Point2d(posx - 35, posy + 50), 0, 1, cv::Scalar(0, 0, 0), 3);
+        // }
         else if (it->getType() == ObjectType::objectVehicle)
         {
             cv::RNG rng(it->getID());
