@@ -7,7 +7,6 @@
 #include "Intersection.h"
 #include "Graphics.h"
 
-
 // Paris
 void createTrafficObjects_Paris(std::vector<std::shared_ptr<Street>> &streets, std::vector<std::shared_ptr<Intersection>> &intersections, std::vector<std::shared_ptr<Vehicle>> &vehicles, std::string &filename, int nVehicles)
 {
@@ -18,6 +17,7 @@ void createTrafficObjects_Paris(std::vector<std::shared_ptr<Street>> &streets, s
     int nIntersections = 9;
     for (size_t ni = 0; ni < nIntersections; ni++)
     {
+        // make_shared = http://www.cplusplus.com/reference/memory/make_shared/
         intersections.push_back(std::make_shared<Intersection>());
     }
 
@@ -118,7 +118,7 @@ int main()
     std::vector<std::shared_ptr<Intersection>> intersections;
     std::vector<std::shared_ptr<Vehicle>> vehicles;
     std::string backgroundImg;
-    int nVehicles = 6;
+    int nVehicles = 2;
     createTrafficObjects_Paris(streets, intersections, vehicles, backgroundImg, nVehicles);
 
     /* PART 2 : simulate traffic objects */
