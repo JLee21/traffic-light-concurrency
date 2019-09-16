@@ -45,7 +45,7 @@ void TrafficLight::simulate()
     threads.emplace_back(std::thread(&TrafficLight::cycleThroughPhases, this));
 }
 
-double getRandomWaitTimeInMs()
+int getRandomWaitTime()
 {
     /*
     Return a random number between and including 4-6
@@ -53,20 +53,19 @@ double getRandomWaitTimeInMs()
     */
     typedef std::chrono::high_resolution_clock myclock;
     myclock::time_point beginning = myclock::now();
-    std::uniform_real_distribution<double> rand(4, 6);
 
     // obtain a seed from the timer
     myclock::duration d = myclock::now() - beginning;
     unsigned seed = d.count();
 
     std::mt19937 generator(seed);
-    std::uniform_int_distribution<double> distribution(4, 6);
+    std::uniform_int_distribution<int> distribution(4, 6);
     return distribution(generator);
 }
 
 void TrafficLight::cycleThroughPhases()
 {
-    int cycleDuration = getRandomWaitTimeInMs();
+    int cycleDuration = getRandomWaitTime();
     std::chrono::time_point<std::chrono::system_clock> lastUpdate;
     lastUpdate = std::chrono::system_clock::now();
 
@@ -78,7 +77,7 @@ void TrafficLight::cycleThroughPhases()
         long timeSinceLastUpdate = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - lastUpdate).count();
         if (timeSinceLastUpdate >= cycleDuration)
         {
-            cycleDuration = getRandomWaitTimeInMs(); // reset light duration
+            cycleDuration = getRandomWaitTime(); // reset light duration
             switch (_currentPhase)
             {
             case TrafficLightPhase::green:
