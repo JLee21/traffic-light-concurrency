@@ -45,10 +45,10 @@ void TrafficLight::simulate()
     threads.emplace_back(std::thread(&TrafficLight::cycleThroughPhases, this));
 }
 
-int getRandomWaitTime()
+double getRandomWaitTime()
 {
     /*
-    Return a random number between and including 4-6
+    Return a random number between and including 4000-6000 ms
     http://www.cplusplus.com/reference/random/uniform_int_distribution/
     */
     typedef std::chrono::high_resolution_clock myclock;
@@ -59,8 +59,8 @@ int getRandomWaitTime()
     unsigned seed = d.count();
 
     std::mt19937 generator(seed);
-    std::uniform_int_distribution<int> distribution(4, 6);
-    return distribution(generator);
+    std::uniform_real_distribution<double> distribution(4, 6);
+    return distribution(generator) * 1000;
 }
 
 void TrafficLight::cycleThroughPhases()
@@ -74,7 +74,7 @@ void TrafficLight::cycleThroughPhases()
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         // compute time difference to stop watch
-        long timeSinceLastUpdate = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - lastUpdate).count();
+        long timeSinceLastUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastUpdate).count();
         if (timeSinceLastUpdate >= cycleDuration)
         {
             cycleDuration = getRandomWaitTime(); // reset light duration

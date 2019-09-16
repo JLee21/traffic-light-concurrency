@@ -10,7 +10,7 @@
 #include <condition_variable>
 #include "TrafficObject.h"
 
-#define YELLOW_LIGHT_DURATION 2
+#define YELLOW_LIGHT_DURATION 2000 // in ms
 
 // forward declarations to avoid include cycle
 class Vehicle;
