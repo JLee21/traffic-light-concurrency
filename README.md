@@ -2,19 +2,42 @@
 
 ## `Project: Program a Concurrent Traffic Simluation`
 
-<img src="data/traffic_simulation.gif"/>
+The fourth project in the [Udacity C++ Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213)
 
-This is the project for the fourth course in the [Udacity C++ Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213): Concurrency.
+<img src="imgs/traffic_movie_gif_1.gif"/>
 
-Throughout the Concurrency course, you have been developing a traffic simulation in which vehicles are moving along streets and are crossing intersections. However, with increasing traffic in the city, traffic lights are needed for road safety. Each intersection will therefore be equipped with a traffic light. In this project, you will build a suitable and thread-safe communication protocol between vehicles and intersections to complete the simulation. Use your knowledge of concurrent programming (such as mutexes, locks and message queues) to implement the traffic lights and integrate them properly in the code base.
+The goal of this course is to learn and apply foundational C++ concepts and practices surrounding concurrency.
+Important topics like futures, promises, threads, mutexes, locks, and message queues were learned and applied in this project.
+
+Key Take-Aways
+
+- each Intersection and Vehicle is running within its own thread
+- each Traffic Light is running with its own task
+- Intersections, Traffic Lights, and Vehicles communicate through concurrent message queues
 
 # Making My Project Stand Out
+
+<img src="imgs/traffic_movie_gif_yellow_light.gif"/>
 
 In order to make my project stand out and from my peers as well as learning to integrate new features to the code base,
 `I added the ability for the traffic lights to change from green to yellow.`
 Without this new requirement, the vehicles may have entered the intersection immediately before the traffic light changed from green to red -- this gave the visual impression that the vehicle was running a red light but in actual fairness a yellow light should have been displayed.
 Now, a vehicle can enter an intersection if the traffic light is green _or_ yellow.
 A further improvement to this is to simulate real life conditions such as not entering an intersection if the traffic light is yellow and the vehicle has plenty of distance to arrive to a safe stop before the intersection.
+
+# Room for Improvement
+
+- Message Queue
+
+  The data structure for the Traffic Light message queuing implemented a `std::deque`, but I couldn't seem to limit the size of the deque to just one.
+  Since I we really care about is the current Traffic Light color.
+  I did not find anything within [std::deque](http://www.cplusplus.com/reference/deque/deque/deque/) where I can limit the size of the queue.
+  My implementation is to "pop_back" an element from the queue as soon as the size reaches 2. In Python's standard module [collections](https://docs.python.org/2/library/collections.html#deque-objects), one can set the max length of the deque ... so I was wanting something like that.
+
+- Random Number Generator
+
+  The Traffic Lights needed to cycle between red and green every 4-6 seconds. In order to get a random value in that range I created a new seed and random generator everytime a call to get a random number was made. Is there a way to avoid excessive calls to creating a new seed and generator?
+  The reason I created a new seed based on system time was because each traffic light's task was using the exact same seed on creation of the thread, so even though the traffic light duration was random, it was not random with respect to the other traffic lights.
 
 # Dependencies for Running Locally
 

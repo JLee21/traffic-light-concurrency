@@ -49,24 +49,21 @@ void Graphics::drawTrafficObjects()
             // cast object type from TrafficObject to Intersection
             std::shared_ptr<Intersection> intersection = std::dynamic_pointer_cast<Intersection>(it);
 
-            // set color according to traffic light and draw the intersection as a circle
-            // cv::Scalar trafficLightColor = intersection->trafficLightIsGreen() == true ? cv::Scalar(0, 255, 0) : cv::Scalar(0, 0, 255);
-
-            // decide if Traffic is green, yellow, or red
-            
-            switch (intersection->getTrafficLightPhase()){
-                case TrafficLightPhase::green:
-                    trafficLightColor = cv::Scalar(0, 255, 0);
-                    break;
-                case TrafficLightPhase::yellow:
-                    trafficLightColor = cv::Scalar(0, 255, 255);
-                    break;
-                case TrafficLightPhase::red:
-                    trafficLightColor = cv::Scalar(0, 0, 255);
-                    break;
+            // decide if Traffic is green, yellow, or red and set the color
+            switch (intersection->getTrafficLightPhase())
+            {
+            case TrafficLightPhase::green:
+                trafficLightColor = cv::Scalar(0, 255, 0);
+                break;
+            case TrafficLightPhase::yellow:
+                trafficLightColor = cv::Scalar(0, 255, 255);
+                break;
+            case TrafficLightPhase::red:
+                trafficLightColor = cv::Scalar(0, 0, 255);
+                break;
             }
             cv::circle(_images.at(1), cv::Point2d(posx, posy), 50, trafficLightColor, -1);
-            cv::putText(_images.at(1), "i."+std::to_string(it->getID()), cv::Point2d(posx - 35, posy + 15), 0, 1, cv::Scalar(0, 0, 0), 3);            
+            cv::putText(_images.at(1), "i." + std::to_string(it->getID()), cv::Point2d(posx - 35, posy + 15), 0, 1, cv::Scalar(0, 0, 0), 3);
         }
         else if (it->getType() == ObjectType::objectVehicle)
         {
@@ -76,7 +73,7 @@ void Graphics::drawTrafficObjects()
             int r = sqrt(255 * 255 - g * g - r * r); // ensure that length of color vector is always 255
             cv::Scalar vehicleColor = cv::Scalar(b, g, r);
             cv::circle(_images.at(1), cv::Point2d(posx, posy), 35, vehicleColor, -1);
-            cv::putText(_images.at(1), "v."+std::to_string(it->getID()), cv::Point2d(posx - 35, posy + 15), 2, 1, cv::Scalar(0, 0, 0), 2);
+            cv::putText(_images.at(1), "v." + std::to_string(it->getID()), cv::Point2d(posx - 35, posy + 15), 2, 1, cv::Scalar(0, 0, 0), 2);
         }
     }
 
