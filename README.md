@@ -1,6 +1,6 @@
 # Udacity C++ Nanodegree
 
-## `Project: Program a Concurrent Traffic Simluation`
+## `Project: Program a Concurrent Traffic Simulation`
 
 The fourth project in the [Udacity C++ Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213)
 
